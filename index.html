@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        background-color: #787878;
+      }
+      .container {
+        width: 360px;
+        height: 400px;
+        margin: 8% auto;
+        background: #fff;
+        border-radius: 5px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      h3 {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #777;
+      }
+
+      .container form {
+        width: 280px;
+        position: absolute;
+        top: 100px;
+        left: 40px;
+        transition: 0.5s;
+      }
+
+      form input {
+        width: 100%;
+        padding: 10px 5px;
+        margin: 5px 0;
+        border: 0;
+        border-bottom: 1px solid #999;
+        outline: none;
+        background: transparent;
+      }
+
+      ::placeholder {
+        color: #777;
+      }
+
+      .btn-box {
+        width: 100%;
+        margin: 30px auto;
+        text-align: center;
+      }
+
+      form button {
+        width: 110px;
+        height: 35px;
+        margin: 0 10px;
+        background: linear-gradient(to right, #ff105f, #ffad06);
+        border-radius: 15px;
+        border: none;
+      }
+
+      #form2 {
+        left: 450px;
+      }
+
+      #form3 {
+        left: 450px;
+      }
+
+      .step-row {
+        width: 360px;
+        height: 40px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 -1px 5px -1px #000;
+        position: relative;
+      }
+
+      .step-col {
+        width: 120px;
+        text-align: center;
+        color: #333;
+        position: relative;
+      }
+
+      #progress {
+        position: absolute;
+        height: 100%;
+        width: 120px;
+        background: linear-gradient(to right, #ff105f, #ffad06);
+        transition: 1s;
+      }
+
+      #progress::after {
+        content: '';
+        height: 0;
+        width: 0;
+        border-top: 20px solid transparent;
+        border-bottom: 20px solid transparent;
+        position: absolute;
+        right: -20px;
+        top: 0;
+        border-left: 20px solid #ffad06;
+      }
+
+      .error-p {
+        font-size: 10px;
+        color: red;
+      }
+
+      .error-input {
+        border: 1px solid red;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <form id="form1">
+        <h3>CREATE ACCOUNT</h3>
+        <input type="text" placeholder="Email" id="emailInput" />
+        <input type="password" placeholder="Password" id="passwordInput" />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          id="confirmPasswordInput"
+        />
+        <p id="form1-p" class="error-p"></p>
+
+        <div class="btn-box">
+          <button type="button" id="next1">Next</button>
+        </div>
+      </form>
+
+      <form id="form2">
+        <h3>SOCIAL LINKS</h3>
+        <input type="text" placeholder="Medium" class="socialInput" />
+        <input type="text" placeholder="Github" class="socialInput" />
+        <input type="text" placeholder="Linkedin" class="socialInput" />
+        <p id="form2-p" class="error-p"></p>
+
+        <div class="btn-box">
+          <button type="button" id="back1">Back</button>
+          <button type="button" id="next2">Next</button>
+        </div>
+      </form>
+
+      <form id="form3">
+        <h3>PERSONALE INFO</h3>
+        <input type="text" placeholder="First Name" class="nameInput" />
+        <input type="text" placeholder="Last Name" class="nameInput" />
+        <input type="text" placeholder="Mobile No" id="mobileInput" />
+        <p id="form3-p" class="error-p"></p>
+
+        <div class="btn-box">
+          <button type="button" id="back2">Back</button>
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+
+      <div class="step-row">
+        <div id="progress"></div>
+        <div class="step-col"><small>Step 1</small></div>
+        <div class="step-col"><small>Step 2</small></div>
+        <div class="step-col"><small>Step 3</small></div>
+      </div>
+    </div>
+
+    <script>
+      const form1 = document.querySelector('#form1');
+      const form2 = document.querySelector('#form2');
+      const form3 = document.querySelector('#form3');
+      const next1 = document.querySelector('#next1');
+      const next2 = document.querySelector('#next2');
+      const back1 = document.querySelector('#back1');
+      const back2 = document.querySelector('#back2');
+      const progress = document.querySelector('#progress');
+
+      const emailInput = document.querySelector('#emailInput');
+      const passwordInput = document.querySelector('#passwordInput');
+      const confirmPasswordInput = document.querySelector(
+        '#confirmPasswordInput'
+      );
+      const socialInputs = document.querySelectorAll('.socialInput');
+      const nameInputs = document.querySelectorAll('.nameInput');
+      const mobileInput = document.querySelector('#mobileInput');
+      const form1P = document.querySelector('#form1-p');
+      const form2P = document.querySelector('#form2-p');
+      const form3P = document.querySelector('#form3-p');
+
+      const checkLength = (value) => {
+        if (value.length < 4) {
+          return 'Entered value should be at least 4 characters';
+        }
+        if (value.length > 80) {
+          return 'Entered value can not be longer than 80 characters';
+        }
+        return true;
+      };
+
+      const validateEmail = (email) => {
+        const isLengthCorrect = checkLength(email);
+        if (typeof isLengthCorrect === 'string') {
+          return isLengthCorrect;
+        }
+        if (!email.includes('@')) {
+          return `Email should include "@"`;
+        }
+        return true;
+      };
+
+      const validatePassword = (password, confirmPassword) => {
+        const isLengthCorrect = checkLength(password);
+        if (typeof isLengthCorrect === 'string') {
+          return isLengthCorrect;
+        }
+        if (password !== confirmPassword) {
+          return 'Passwords do not match';
+        }
+        return true;
+      };
+
+      const validateUrl = (url) => {
+        const isLengthCorrect = checkLength(url);
+        if (typeof isLengthCorrect === 'string') {
+          return isLengthCorrect;
+        }
+        if (!url.startsWith('https')) {
+          return `Valid URL should start with "https"`;
+        }
+        return true;
+      };
+
+      const displayError = (p, input, message) => {
+        p.textContent = message;
+        input.classList.add('error-input');
+      };
+
+      next1.addEventListener('click', () => {
+        let isFormValid = true;
+        const isEmailValid = validateEmail(emailInput.value);
+        if (typeof isEmailValid === 'string') {
+          isFormValid = false;
+          displayError(form1P, emailInput, isEmailValid);
+          return;
+        }
+        const isPasswordValid = validatePassword(
+          passwordInput.value,
+          confirmPasswordInput.value
+        );
+        if (typeof isPasswordValid === 'string') {
+          isFormValid = false;
+          displayError(form1P, passwordInput, isPasswordValid);
+          return;
+        }
+        emailInput.classList.remove('error-input');
+        passwordInput.remove('error-input');
+        form1P.textContent = '';
+        form1.style.left = '-450px';
+        form2.style.left = '40px';
+        progress.style.width = '240px';
+      });
+
+      back1.addEventListener('click', () => {
+        form1.style.left = '40px';
+        form2.style.left = '450px';
+        progress.style.width = '120px';
+      });
+
+      next2.addEventListener('click', () => {
+        let isFormValid = true;
+        socialInputs.forEach((input, i) => {
+          const isValid = validateUrl(input.value);
+          if (typeof isValid === 'string') {
+            isFormValid = false;
+            displayError(form2P, socialInputs[i], isValid);
+            return;
+          }
+        });
+
+        if (isFormValid) {
+          form2P.textContent = '';
+          socialInputs.forEach((input) => {
+            input.classList.remove('error-input');
+          });
+          form2.style.left = '-450px';
+          form3.style.left = '40px';
+          progress.style.width = '360px';
+        }
+      });
+
+      back2.addEventListener('click', () => {
+        form2.style.left = '40px';
+        form3.style.left = '450px';
+        progress.style.width = '240px';
+      });
+
+      form3.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let isFormValid = true;
+        nameInputs.forEach((input, i) => {
+          const isValid = checkLength(input.value);
+          if (typeof isValid === 'string') {
+            isFormValid = false;
+            displayError(form3P, nameInputs[i], isValid);
+            return;
+          }
+        });
+        if (isFormValid) {
+          nameInputs.forEach((input) => {
+            input.classList.remove('error-input');
+          });
+          form3P.textContent = '';
+          console.log('submit');
+        }
+      });
+    </script>
+  </body>
+</html>
